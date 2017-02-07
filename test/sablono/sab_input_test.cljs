@@ -21,6 +21,7 @@
       [:input
        {:value @state
         :on-change (fn [ev]
+                     (println ":on-change")
                      (reset! state
                              (.toUpperCase (aget ev "target" "value"))))}]))
   (atom "edit me!")

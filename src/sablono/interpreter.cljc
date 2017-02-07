@@ -36,27 +36,33 @@
            (initial-state this property)))
        :onChange
        (fn [event]
+         (println ":onChange")
          (this-as this
            (when-let [handler (.-onChange (.-props this))]
              (handler event)
-             (update-state this (.-props this) property (object/getValueByKeys event "target" property)))))
-       :componentWillReceiveProps
-       (fn [new-props]
-         (this-as this
-           (let [state-value (object/getValueByKeys this "state" property)
-                 element-value (object/get (js/ReactDOM.findDOMNode this) property)]
-             ;; on IE, onChange event might come after actual value of an element
-             ;; have changed. We detect this and render element as-is, hoping that
-             ;; next onChange will eventually come and bring our modifications anyways.
-             ;; Ignoring this causes skipped letters in controlled components
-             ;; https://github.com/reagent-project/reagent/issues/253
-             ;; https://github.com/tonsky/rum/issues/86
-             (if (not= state-value element-value)
-               (update-state this new-props property element-value)
-               (update-state this new-props property (object/get new-props property))))))
+             (update-state this (.-props this) property (object/getValueByKeys event "target" property))
+             )))
+       ;:componentWillReceiveProps
+       ;(fn [new-props]
+         ;(println "will receive new" new-props)
+         ;(this-as this
+           ;(let [state-value (object/getValueByKeys this "state" property)
+                 ;element-value (object/get (js/ReactDOM.findDOMNode this) property)]
+             ;;; on IE, onChange event might come after actual value of an element
+             ;;; have changed. We detect this and render element as-is, hoping that
+             ;;; next onChange will eventually come and bring our modifications anyways.
+             ;;; Ignoring this causes skipped letters in controlled components
+             ;;; https://github.com/reagent-project/reagent/issues/253
+             ;;; https://github.com/tonsky/rum/issues/86
+             ;(println "ev sv" element-value state-value)
+             ;(if (not= state-value element-value)
+               ;(update-state this new-props property element-value)
+               ;(update-state this new-props property (object/get new-props property))))))
        :render
        (fn []
          (this-as this
+                  (println "rendering with state" (.-state this))
+                  (println "rendering with props" (.-props this))
            (js/React.createElement element (.-state this))))})))
 
 #?(:cljs (def wrapped-input (wrap-form-element "input" "value")))
